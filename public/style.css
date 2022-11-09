@@ -1,3 +1,10 @@
 * {
     background-color: hotpink;
 }
+h1 {
+    color: white;
+}
+canvas {
+    margin: 1rem;
+    background-color: rgb(255, 188, 210);
+}
