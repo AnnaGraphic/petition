@@ -1,13 +1,8 @@
-<h1>leaking your data here👇</h1>
-
-<ul class="authors">
-{{#authors}}
-    <li class="author">
-        {{name}}
-        <ul class="books">
-            {{#books}}
-                <li class="book">{{title}}
-            {{/books}}
-        </ul>
-{{/authors}}
-</ul>
+<div id="container">
+    <h1>🌈 Your private data here! 🌈</h1>
+    <ul>
+        {{#fullname}}
+            <p>{{firstname}} {{lastname}}</p>
+        {{/fullname}}
+    </ul>
+</div>
