@@ -15,22 +15,22 @@ app.set("view engine", "handlebars");
 
 //COOKIES
 const cookieParser = require("cookie-parser");
-// install middleware to help us read cookies easily
-app.use(cookieParser());
-// install middleware to help us read POST body (form data) easily
-app.use(express.urlencoded({ extended: false }));
-
 const cookieSession = require("cookie-session");
 
 //MIDDLEWARE
 app.use("/", express.static(path.join(__dirname, "public")));
+
+// install middleware to help us read cookies easily
+app.use(cookieParser());
+// install middleware to help us read POST body (form data) easily
+app.use(express.urlencoded({ extended: false }));
 
 // causes session-object to be stringified, base64 encoded , and written to a cookie,
 // then decode, parse and attach to req-obj
 //Tampering is prevented because of a second cookie that is auto added.
 app.use(
     cookieSession({
-        // secret is used to generate the 2. cookie used to verify the integrity of the 1. cookie
+        // secret is used tcookieSessiono generate the 2. cookie used to verify the integrity of the 1. cookie
         secret: `${SECRET}`,
         // max age (in milliseconds) is 14 days in this example
         maxAge: 1000 * 60 * 60 * 24 * 14,
@@ -39,8 +39,14 @@ app.use(
     })
 );
 
-app.use("/", (req, res, next) => {
-    console.log(req.session);
+app.use((req, res, next) => {
+    console.log("---------------------");
+    console.log("req.url:", req.url);
+    console.log("req.method:", req.method);
+    console.log("req.session:", req.session);
+    console.log("req.session.user_id:", req.session.user_id);
+    console.log("---------------------");
+    next();
 });
 
 //ROUTES
@@ -48,7 +54,9 @@ app.use("/", (req, res, next) => {
 //petition-page
 app.get("/", (req, res) => {
     // check negative first so i dont need an else
-    // if (!(req.session && req.session.user_id){return res.redirect(/login)})
+    // if (req.session && req.session.user_id) {
+    //     return res.redirect("/thanks");
+    // }
     res.render("petition", {
         title: "Snack Box Petition",
     });
@@ -56,13 +64,12 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
     //console.log("post req");
-
-    const { id, firstName, lastName, signatureCanvas } = req.body;
+    const { id, firstName, lastName, signature } = req.body;
+    console.log("signature", signature);
     db.insertSubscriber({
         firstname: firstName,
         lastname: lastName,
-
-        //signatureCanvas: how to do this?
+        signature: signature,
     }).then((data) => {
         console.log("data", data);
         req.session.user_id = data.id;
@@ -79,7 +86,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
-    console.log("post");
+    // console.log("post");
     db.authenticateUser(email, password)
         .then((user) => {
             // store the id of the logged in user inside the session cookie
@@ -97,23 +104,27 @@ app.post("/login", (req, res) => {
 
 //thank-you-page
 app.get("/thanks", (req, res) => {
-    res.render("thanks", {
-        title: "Snack Box Petition",
-    });
+    const { id, firstName, lastName, signatureCanvas } = req.body;
     db.getSubscribers()
-        .then((result) => {})
+        .then((result) => {
+            res.render("thanks", {
+                title: "Snack Box Petition",
+                firstname: firstName,
+                lastname: lastName,
+            });
+        })
         .catch((err) => console.log(err));
 });
 
 //signers page
 app.get("/signers", (req, res) => {
-    db.getSubscribers().then((results) => {
+    db.getSubscribers().then((result) => {
         // console.log(results);
-        req.session.user_signed = results.id;
+        req.session.user_signed = result.id;
         res.render("signers", {
             title: "Snack Box Petition",
             //fullname = selbst vergebene variable, result.rows
-            fullname: results.rows,
+            fullname: result.rows,
         });
     });
 });
