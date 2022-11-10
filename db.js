@@ -6,7 +6,7 @@ const { POSTGRES_PWD, POSTGRES_USER } = process.env;
 const database = "petition";
 //5432 = standardport
 const db = spicedPg(
-    `postgres:postgres:${POSTGRES_PWD}@localhost:5432/${database}`
+    `postgres:${POSTGRES_USER}:${POSTGRES_PWD}@localhost:5432/${database}`
 );
 
 //.querymethod to qurey my database
@@ -34,7 +34,7 @@ module.exports.insertSubscriber = ({ firstname, lastname, signature }) => {
         ) //once data is saved, set cookie to remember this, then res.render("thanks");
         .then((result) => {
             // console.log("result", result);
-            result.rows[0];
+            return result.rows[0];
         });
 };
 // do we need to crate a account table?

@@ -8,11 +8,12 @@ const { getSignatureTable } = require("./db.js");
 const PORT = 8080;
 const { SECRET } = process.env;
 
-//handlebars
+//HANDLEBARS
 const handlebars = require("express-handlebars");
 app.engine("handlebars", handlebars.engine());
 app.set("view engine", "handlebars");
 
+//COOKIES
 const cookieParser = require("cookie-parser");
 // install middleware to help us read cookies easily
 app.use(cookieParser());
@@ -20,17 +21,27 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 const cookieSession = require("cookie-session");
-//initial config
+
+//MIDDLEWARE
+app.use("/", express.static(path.join(__dirname, "public")));
+
+// causes session-object to be stringified, base64 encoded , and written to a cookie,
+// then decode, parse and attach to req-obj
+//Tampering is prevented because of a second cookie that is auto added.
 app.use(
     cookieSession({
         // secret is used to generate the 2. cookie used to verify the integrity of the 1. cookie
         secret: `${SECRET}`,
+        // max age (in milliseconds) is 14 days in this example
         maxAge: 1000 * 60 * 60 * 24 * 14,
+        //name for session cookie
+        name: "petition-cookie",
     })
 );
 
-//MIDDLEWARE
-app.use("/", express.static(path.join(__dirname, "public")));
+app.use("/", (req, res, next) => {
+    console.log(req.session);
+});
 
 //ROUTES
 
@@ -45,20 +56,47 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
     //console.log("post req");
-    const { firstName, lastName, signatureCanvas } = req.body;
+
+    const { id, firstName, lastName, signatureCanvas } = req.body;
     db.insertSubscriber({
         firstname: firstName,
         lastname: lastName,
+
         //signatureCanvas: how to do this?
-    }).then(() => {
-        // res.cookie("signed", "true");
+    }).then((data) => {
+        console.log("data", data);
+        req.session.user_id = data.id;
         res.redirect("/thanks");
     });
 });
 
+//login
+app.get("/login", (req, res) => {
+    res.render("login", {
+        title: "Snack Box Petition",
+    });
+});
+
+app.post("/login", (req, res) => {
+    const { email, password } = req.body;
+    console.log("post");
+    db.authenticateUser(email, password)
+        .then((user) => {
+            // store the id of the logged in user inside the session cookie
+            req.session.user_id = user.id;
+            res.redirect("/petition");
+            console.log(req.session.user_id);
+        })
+        .catch(() => {
+            res.render("login", {
+                message: "quatsch",
+                title: "Snack Box Petition",
+            });
+        });
+});
+
 //thank-you-page
 app.get("/thanks", (req, res) => {
-    //kaputt
     res.render("thanks", {
         title: "Snack Box Petition",
     });
@@ -69,14 +107,26 @@ app.get("/thanks", (req, res) => {
 
 //signers page
 app.get("/signers", (req, res) => {
-    //  console.log("get thanks");
     db.getSubscribers().then((results) => {
-        console.log(results);
+        // console.log(results);
+        req.session.user_signed = results.id;
         res.render("signers", {
             title: "Snack Box Petition",
+            //fullname = selbst vergebene variable, result.rows
             fullname: results.rows,
         });
     });
 });
+
+//registration
+app.get("/signup", (req, res) => {
+    res.render("signup", {
+        title: "Snack Box Petition",
+    });
+});
+
+// app.post("/signup", (req, res) => {
+//     console.log("signup", req.session);
+// });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
