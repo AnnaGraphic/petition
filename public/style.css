@@ -1,5 +1,30 @@
 * {
+    margin: 0;
+    padding: 0;
+}
+header {
+    height: 5rem;
+    width: 100vw;
+    display: flex;
+    align-self: flex-start;
+    justify-content: center;
+    background-color: rgb(243, 81, 162);
+}
+
+.container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
     background-color: hotpink;
+    flex-direction: column;
+}
+.main {
+    padding: 1rem;
+    height: a100vh;
+}
+footer {
+    align-self: flex-end;
+    height: 3rem;
 }
 h1 {
     color: white;

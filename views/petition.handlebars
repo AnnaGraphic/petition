@@ -1,14 +1,15 @@
 <header>
 <div class="container">
 <h1>🌈 Yay, this is a petition 🌈</h1>
+<br>
 <p>against empty snack boxes</p>
 </header>
-
+<div class="container">
 <form method="POST" action="">
     <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName"> </input>
+    <input type="text" id="firstName" name="firstName" value="{{firstName}}"> </input>
     <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName"> </input>
+    <input type="text" id="lastName" name="lastName" value="{{lastName}}"> </input>
         <br>
     <canvas id="signatureCanvas" width="300" height="100">Subscribe!</canvas>
     <input type="hidden" name="signature" id="signature" />
@@ -16,3 +17,6 @@
     <button type="submit" name="signed" value="true">submit</button>
 </form>
 </div>
+<footer>
+    
+</footer>

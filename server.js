@@ -4,9 +4,10 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const fs = require("fs");
-const { getSignatureTable } = require("./db.js");
 const PORT = 8080;
 const { SECRET } = process.env;
+
+const bcrypt = require("bcrypt");
 
 //HANDLEBARS
 const handlebars = require("express-handlebars");
@@ -20,9 +21,9 @@ const cookieSession = require("cookie-session");
 //MIDDLEWARE
 app.use("/", express.static(path.join(__dirname, "public")));
 
-// install middleware to help us read cookies easily
+// install middleware to helps read cookies
 app.use(cookieParser());
-// install middleware to help us read POST body (form data) easily
+// install middleware to helps read POST body (form data)
 app.use(express.urlencoded({ extended: false }));
 
 // causes session-object to be stringified, base64 encoded , and written to a cookie,
@@ -30,7 +31,7 @@ app.use(express.urlencoded({ extended: false }));
 //Tampering is prevented because of a second cookie that is auto added.
 app.use(
     cookieSession({
-        // secret is used tcookieSessiono generate the 2. cookie used to verify the integrity of the 1. cookie
+        // secret is used cookieSession to generate the 2. cookie used to verify the integrity of the 1. cookie
         secret: `${SECRET}`,
         // max age (in milliseconds) is 14 days in this example
         maxAge: 1000 * 60 * 60 * 24 * 14,
@@ -59,15 +60,17 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-    //  console.log("signup", req.body);
     const { firstnameSignup, lastnameSignup, emailSignup, passwordSignup } =
         req.body;
+    const salt = bcrypt.genSaltSync();
+    const hash = bcrypt.hashSync(passwordSignup, salt);
+
     // console.log("firstnamesignup", firstnameSignup);
     db.insertRegistration({
         first_name: firstnameSignup,
         last_name: lastnameSignup,
         email: emailSignup,
-        password: passwordSignup,
+        password: hash,
     })
         .then((userData) => {
             //console.log("user data", userData);
@@ -81,26 +84,38 @@ app.post("/", (req, res) => {
         });
 });
 
-    // check negative first so i dont need an else
-    // if (req.session && req.session.user_id) {
-    //     return res.redirect("/thanks");
-    // }
-    res.render("petition", {
-        title: "Snack Box Petition",
-    });
+//petition-page
+app.get("/petition", (req, res) => {
+    console.log(req.session.signed);
+    //console.log("req.session.user_id", req.session.user_id)
+    if (req.session && req.session.signed) {
+        return res.redirect("/thanks");
+    }
+    db.findUser({
+        id: req.session.user_id,
+    })
+        .then((userData) => {
+            // console.log("petition userdata", userData);
+            res.render("petition", {
+                title: "Snack Box Petition",
+                firstName: userData.first_name,
+                lastName: userData.last_name,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
-app.post("/", (req, res) => {
+app.post("/petition", (req, res) => {
     //console.log("post req");
-    const { id, firstName, lastName, signature } = req.body;
-    console.log("signature", signature);
+    const { signature } = req.body;
     db.insertSubscriber({
-        firstname: firstName,
-        lastname: lastName,
+        user_id: req.session.user_id,
         signature: signature,
     }).then((data) => {
-        console.log("data", data);
-        req.session.user_id = data.id;
+        // console.log("petition data", data);
+        req.session.signed = 1;
         res.redirect("/thanks");
     });
 });
@@ -115,14 +130,13 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     const { email, password } = req.body;
     // console.log("post");
-    db.authenticateUser(email, password)
+    db.authenticateUser({ email: email, password: password })
         .then((user) => {
-            // store the id of the logged in user inside the session cookie
             req.session.user_id = user.id;
             res.redirect("/petition");
-            console.log(req.session.user_id);
         })
-        .catch(() => {
+        .catch((err) => {
+            console.log(err);
             res.render("login", {
                 message: "quatsch",
                 title: "Snack Box Petition",
@@ -133,12 +147,13 @@ app.post("/login", (req, res) => {
 //thank-you-page
 app.get("/thanks", (req, res) => {
     const { id, firstName, lastName, signatureCanvas } = req.body;
-    db.getSubscribers()
-        .then((result) => {
+    db.findUser({
+        id: req.session.user_id,
+    })
+        .then((userData) => {
             res.render("thanks", {
                 title: "Snack Box Petition",
-                firstname: firstName,
-                lastname: lastName,
+                firstname: userData.first_name,
             });
         })
         .catch((err) => console.log(err));
@@ -147,25 +162,13 @@ app.get("/thanks", (req, res) => {
 //signers page
 app.get("/signers", (req, res) => {
     db.getSubscribers().then((result) => {
-        // console.log(results);
+        console.log("RESULTS SIGNERS", result);
         req.session.user_signed = result.id;
         res.render("signers", {
             title: "Snack Box Petition",
-            //fullname = selbst vergebene variable, result.rows
-            fullname: result.rows,
+            signatures: result,
         });
     });
 });
-
-//registration
-app.get("/signup", (req, res) => {
-    res.render("signup", {
-        title: "Snack Box Petition",
-    });
-});
-
-// app.post("/signup", (req, res) => {
-//     console.log("signup", req.session);
-// });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

@@ -1,5 +1,6 @@
 //Pg = postgresql
-const { query } = require("express");
+//const { query } = require("express");
+const e = require("express");
 const spicedPg = require("spiced-pg");
 const { POSTGRES_PWD, POSTGRES_USER } = process.env;
 // console.log(POSTGRES_PWD, POSTGRES_USER);
@@ -8,30 +9,43 @@ const database = "petition";
 const db = spicedPg(
     `postgres:${POSTGRES_USER}:${POSTGRES_PWD}@localhost:5432/${database}`
 );
+const bcrypt = require("bcrypt");
 
-//.querymethod to qurey my database
-db.query(`SELECT * FROM signatures`)
-    .then(function (result) {
-        console.log(result.rows);
-    })
-    .catch(function (err) {
-        console.log(err);
-    });
+//.querymethod to query my database
+// db.query(`SELECT * FROM signatures`)
+//     .then(function (result) {
+//         // console.log(result.rows);
+//     })
+//     .catch(function (err) {
+//         console.log(err);
+//     });
 
-//Preventing SQL injection https://spiced.space/okra/spiced_pg/
 module.exports.getSubscribers = () => {
-    return db.query(`SELECT firstname, lastname FROM signatures`);
-};
-
-module.exports.insertSubscriber = ({ firstname, lastname, signature }) => {
     return db
         .query(
-            `INSERT INTO signatures (firstname, lastname, signature)
-            VALUES($1, $2, $3)
+            `SELECT 
+                signatures.signature AS signature, 
+                users.first_name AS first_name, 
+                users.last_name AS last_name 
+            FROM signatures 
+            JOIN users ON signatures.user_id=users.id;`
+        )
+        .then((result) => {
+            return result.rows;
+        });
+};
+
+//Preventing SQL injection https://spiced.space/okra/spiced_pg/
+module.exports.insertSubscriber = ({ user_id, signature }) => {
+    return db
+        .query(
+            `INSERT INTO signatures (user_id, signature)
+            VALUES($1, $2)
             RETURNING *`,
             //RETURNING gibt die spalten an, die zurueck gegeben werden im result
-            [firstname, lastname, signature]
-        ) //once data is saved, set cookie to remember this, then res.render("thanks");
+            // WAS macht dieses ARR?
+            [user_id, signature]
+        )
         .then((result) => {
             // console.log("result", result);
             return result.rows[0];
@@ -64,3 +78,31 @@ module.exports.insertRegistration = ({
         });
 };
 
+// do we need to crate an account table?
+function findUserByEmail(email) {
+    return db
+        .query("SELECT * FROM users WHERE email=$1", [email])
+        .then((results) => {
+            if (results.rows.length == 0) {
+                throw new Error("email does not exist");
+            }
+            return results.rows[0];
+        });
+}
+
+module.exports.authenticateUser = ({ email, password }) => {
+    return findUserByEmail(email).then((user) => {
+        if (!bcrypt.compareSync(password, user.password)) {
+            throw new Error("password incorrect");
+        }
+        return user;
+    });
+};
+
+module.exports.findUser = ({ id: a }) => {
+    return db
+        .query("SELECT * FROM users WHERE id = $1", [a])
+        .then((results) => {
+            return results.rows[0];
+        });
+};
