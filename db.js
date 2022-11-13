@@ -58,14 +58,16 @@ module.exports.insertRegistration = ({
     email,
     password,
 }) => {
+    const salt = bcrypt.genSaltSync();
+    const hash = bcrypt.hashSync(password, salt);
     return db
         .query(
             // kriegt 2 args | 1. string 2. array von parametern
             //Preventing SQL injection
-            `INSERT INTO users (first_name, last_name, email, password)
+            `INSERT INTO users (first_name, last_name, email, pwd_hash)
     VALUES($1, $2, $3, $4)
     RETURNING *`,
-            [first_name, last_name, email, password]
+            [first_name, last_name, email, hash]
         )
         .then((result) => {
             // console.log(
@@ -92,7 +94,7 @@ function findUserByEmail(email) {
 
 module.exports.authenticateUser = ({ email, password }) => {
     return findUserByEmail(email).then((user) => {
-        if (!bcrypt.compareSync(password, user.password)) {
+        if (!bcrypt.compareSync(password, user.pwd_hash)) {
             throw new Error("password incorrect");
         }
         return user;

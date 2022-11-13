@@ -7,8 +7,6 @@ const fs = require("fs");
 const PORT = 8080;
 const { SECRET } = process.env;
 
-const bcrypt = require("bcrypt");
-
 //HANDLEBARS
 const handlebars = require("express-handlebars");
 app.engine("handlebars", handlebars.engine());
@@ -62,15 +60,13 @@ app.get("/", (req, res) => {
 app.post("/", (req, res) => {
     const { firstnameSignup, lastnameSignup, emailSignup, passwordSignup } =
         req.body;
-    const salt = bcrypt.genSaltSync();
-    const hash = bcrypt.hashSync(passwordSignup, salt);
 
     // console.log("firstnamesignup", firstnameSignup);
     db.insertRegistration({
         first_name: firstnameSignup,
         last_name: lastnameSignup,
         email: emailSignup,
-        password: hash,
+        password: passwordSignup,
     })
         .then((userData) => {
             //console.log("user data", userData);
