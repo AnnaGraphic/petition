@@ -4,29 +4,34 @@
 <p>against empty snack boxes</p>
 </header>
 
-<br>
+<div class="container">
 {{!-- login-div --}}
-<form method="POST" action="">
-    <div id="signup">
-        <input type="text" id="firstnamesignup" name="firstnamesignup"> </input>
-             <br>
-            <label for="efirstnamesignup">name</label>
+    <form method="POST" action="">
+        <div id="signup">
+            <input type="text" id="firstnameSignup" name="firstnameSignup"> </input>
+                <br>
+                <label for="firstnameSignup">first name</label>
+                <br>
+                <input type="text" id="lastnameSignup" name="lastnameSignup"> </input>
+                <br>
+                <label for="lastnameSignup">last name</label>
+                <br>
+            <input type="text" id="emailSignup" name="emailSignup"> </input>
+                <br>
+                <label for="emailSignup">eMail adress</label>
+                <br>
+            <input type="text" id="passwordSignup" name="passwordSignup"> </input>
+                <br>
+                <label for="passwordSignup">Password</label>
+                <br>
+            <button id="signup">
+                sign up
+            </button>
             <br>
-        <input type="text" id="emailSignu" name="emailSignu"> </input>
-            <br>
-            <label for="emailSignup">eMail adress</label>
-            <br>
-        <input type="text" id="passwordsignup" name="passwordsignup"> </input>
-            <br>
-             <label for="passwordsignup">Password</label>
-            <br>
-        <button id="signup">
-            sign up
-        </button>
-    </div>
-</form>
-<div>
-    <p>if yor already registred, please <a href="/login">log in</a> </p>
-</div>
+            <div>
+                <p>if yor already registred, please <a href="/login">log in</a> </p>
+            </div>
+        </div>
+    </form>
 
 </div>

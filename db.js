@@ -37,7 +37,30 @@ module.exports.insertSubscriber = ({ firstname, lastname, signature }) => {
             return result.rows[0];
         });
 };
-// do we need to crate a account table?
-// module.exports.findUserByEmail(email) = () => {
-//     return db.query(`SELECT * FROM users WHERE email=$1`, [email]);
-// }
+
+module.exports.insertRegistration = ({
+    first_name,
+    last_name,
+    email,
+    password,
+}) => {
+    return db
+        .query(
+            // kriegt 2 args | 1. string 2. array von parametern
+            //Preventing SQL injection
+            `INSERT INTO users (first_name, last_name, email, password)
+    VALUES($1, $2, $3, $4)
+    RETURNING *`,
+            [first_name, last_name, email, password]
+        )
+        .then((result) => {
+            // console.log(
+            //     "result insertRegistration",
+            //     result,
+            //     "result.rows[0]",
+            //     result.rows[0]
+            // );
+            return result.rows[0];
+        });
+};
+

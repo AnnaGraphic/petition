@@ -51,8 +51,36 @@ app.use((req, res, next) => {
 
 //ROUTES
 
-//petition-page
+//registration
 app.get("/", (req, res) => {
+    res.render("signup", {
+        title: "Snack Box Petition",
+    });
+});
+
+app.post("/", (req, res) => {
+    //  console.log("signup", req.body);
+    const { firstnameSignup, lastnameSignup, emailSignup, passwordSignup } =
+        req.body;
+    // console.log("firstnamesignup", firstnameSignup);
+    db.insertRegistration({
+        first_name: firstnameSignup,
+        last_name: lastnameSignup,
+        email: emailSignup,
+        password: passwordSignup,
+    })
+        .then((userData) => {
+            //console.log("user data", userData);
+            req.session.user_id = userData.id;
+            //neuer cookie fuer bereits registriert
+            //namen auch rein
+            res.redirect("/petition");
+        })
+        .catch((err) => {
+            console.log("error in signup post: ", err);
+        });
+});
+
     // check negative first so i dont need an else
     // if (req.session && req.session.user_id) {
     //     return res.redirect("/thanks");
