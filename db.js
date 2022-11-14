@@ -39,12 +39,12 @@ module.exports.getSubscribers = () => {
 module.exports.insertSubscriber = ({ user_id, signature }) => {
     return db
         .query(
-            `INSERT INTO signatures (user_id, signature)
-            VALUES($1, $2)
+            `INSERT INTO signatures (signature)
+            VALUES($1)
             RETURNING *`,
             //RETURNING gibt die spalten an, die zurueck gegeben werden im result
             // WAS macht dieses ARR?
-            [user_id, signature]
+            [signature]
         )
         .then((result) => {
             // console.log("result", result);

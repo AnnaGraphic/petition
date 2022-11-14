@@ -108,7 +108,6 @@ app.post("/petition", (req, res) => {
     //console.log("post req");
     const { signature } = req.body;
     db.insertSubscriber({
-        user_id: req.session.user_id,
         signature: signature,
     }).then((data) => {
         // console.log("petition data", data);
