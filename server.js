@@ -32,7 +32,7 @@ app.use(
         // secret is used cookieSession to generate the 2. cookie used to verify the integrity of the 1. cookie
         secret: `${SECRET}`,
         // max age (in milliseconds) is 14 days in this example
-        maxAge: 1000 * 60 * 60 * 24 * 14,
+        maxAge: 1000 * 60 ** 24 * 14,
         //name for session cookie
         name: "petition-cookie",
     })
@@ -82,7 +82,7 @@ app.post("/", (req, res) => {
 
 //petition-page
 app.get("/petition", (req, res) => {
-    console.log(req.session.signed);
+    //console.log(req.session.signed);
     //console.log("req.session.user_id", req.session.user_id)
     if (req.session && req.session.signed) {
         return res.redirect("/thanks");
@@ -96,6 +96,7 @@ app.get("/petition", (req, res) => {
                 title: "Snack Box Petition",
                 firstName: userData.first_name,
                 lastName: userData.last_name,
+                eMail: userData.email,
             });
         })
         .catch((err) => {
@@ -165,6 +166,25 @@ app.get("/signers", (req, res) => {
             signatures: result,
         });
     });
+});
+
+// edit profile
+app.get("/profile", (req, res) => {
+    db.findUser({
+        id: req.session.user_id,
+    })
+        .then((userData) => {
+            console.log("xxserdata", userData);
+            // console.log("petition userdata", userData);
+            res.render("profile", {
+                title: "Snack Box Petition",
+                firstName: userData.first_name,
+                lastName: userData.last_name,
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
