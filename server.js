@@ -173,8 +173,6 @@ app.get("/profile", (req, res) => {
         id: req.session.user_id,
     })
         .then((userData) => {
-            console.log("xxserdata", userData);
-            // console.log("petition userdata", userData);
             res.render("profile", {
                 title: "Snack Box Petition",
                 firstName: userData.first_name,
@@ -184,6 +182,15 @@ app.get("/profile", (req, res) => {
         .catch((err) => {
             console.log(err);
         });
+});
+
+app.post("/profile", (req, res) => {
+    const userId = req.session.user_id;
+    const { ageEdit, cityEdit, url } = req.body;
+    console.log("req.body:", req.body);
+    //console.log("age, city, url, userId", ageEdit, cityEdit, url, userId);
+    db.updateProfile(ageEdit, cityEdit, url, userId);
+    //then und catch
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

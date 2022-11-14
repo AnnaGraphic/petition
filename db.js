@@ -80,7 +80,6 @@ module.exports.insertRegistration = ({
         });
 };
 
-// do we need to crate an account table?
 function findUserByEmail(email) {
     return db
         .query("SELECT * FROM users WHERE email=$1", [email])
@@ -106,5 +105,26 @@ module.exports.findUser = ({ id: a }) => {
         .query("SELECT * FROM users WHERE id = $1", [a])
         .then((results) => {
             return results.rows[0];
+        });
+};
+
+module.exports.updateProfile = (age, city, url, userId) => {
+    console.log("age, city, url, userId", age, city, url, userId);
+    return db
+        .query(
+            `INSERT INTO users_profiles (age, city, url, user_id)
+        VALUES($1, $2, $3, $4)
+        ON CONFLICT (id)
+        DO UPDATE SET age = $1, city = $2, url = $3, user_id = $4;`,
+            [age, city, url, userId]
+        )
+        .then((result) => {
+            console.log(
+                "result update profile",
+                result,
+                "result.rows[0]",
+                result.rows[0]
+            );
+            return result.rows[0];
         });
 };
