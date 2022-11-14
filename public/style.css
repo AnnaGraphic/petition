@@ -6,8 +6,10 @@ header {
     height: 5rem;
     width: 100vw;
     display: flex;
+    flex-direction: column;
     align-self: flex-start;
     justify-content: center;
+    align-items: center;
     background-color: rgb(243, 81, 162);
 }
 
@@ -15,24 +17,39 @@ header {
     height: 100vh;
     width: 100vw;
     display: flex;
+    padding-top: 1rem;
     background-color: hotpink;
     flex-direction: column;
+    align-items: center;
 }
 .main {
     padding: 1rem;
-    height: a100vh;
+}
+
+form {
+    width: fit-content;
 }
 footer {
     align-self: flex-end;
     height: 3rem;
 }
-h1 {
-    color: white;
-}
+
 canvas {
     margin: 1rem;
     background-color: rgb(255, 188, 210);
 }
 button {
     margin: 1rem;
+}
+
+/* TYPO */
+h1 {
+    color: white;
+}
+h2 {
+    font-size: medium;
+    padding: 0.5rem;
+}
+p {
+    padding: 0.1rem;
 }

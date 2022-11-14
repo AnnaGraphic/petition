@@ -189,7 +189,13 @@ app.post("/profile", (req, res) => {
     const { ageEdit, cityEdit, url } = req.body;
     console.log("req.body:", req.body);
     //console.log("age, city, url, userId", ageEdit, cityEdit, url, userId);
-    db.updateProfile(ageEdit, cityEdit, url, userId);
+    db.updateProfile(ageEdit, cityEdit, url, userId).then((user) => {
+        res.render("login", {
+            title: "Snack Box Petition",
+        }).catch((err) => {
+            console.log(err);
+        });
+    });
     //then und catch
 });
 

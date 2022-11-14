@@ -108,23 +108,30 @@ module.exports.findUser = ({ id: a }) => {
         });
 };
 
+// module.exports.findUser = ({ id: a }) => {
+//     return db
+//         .query(
+//             `SELECT * FROM users WHERE id = $1 FROM signatures
+//             JOIN users ON signatures.user_id=users.id;`,
+//             [a]
+//         )
+//         .then((results) => {
+//             console.log("megajoin", result.rows[0]);
+//             return results.rows[0];
+//         });
+// };
+
 module.exports.updateProfile = (age, city, url, userId) => {
     console.log("age, city, url, userId", age, city, url, userId);
     return db
         .query(
             `INSERT INTO users_profiles (age, city, url, user_id)
         VALUES($1, $2, $3, $4)
-        ON CONFLICT (id)
-        DO UPDATE SET age = $1, city = $2, url = $3, user_id = $4;`,
+        ON CONFLICT (user_id)
+        DO UPDATE SET age = $1, city = $2, url = $3`,
             [age, city, url, userId]
-        )
+        ) //what to do with result.rows?
         .then((result) => {
-            console.log(
-                "result update profile",
-                result,
-                "result.rows[0]",
-                result.rows[0]
-            );
             return result.rows[0];
         });
 };
