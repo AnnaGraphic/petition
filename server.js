@@ -59,23 +59,28 @@ app.use(["/register", "/login"], (req, res, next) => {
         next();
     } else {
         //if (signature) { res.redirect}
-        return res.redirect("/petition");
+        if (!req.session.signed) {
+            return res.redirect("/petition");
+        }
     }
 });
 
 //ROUTES
 app.get("/", (req, res) => {
+    if (!req.session.user_id) {
+        return res.redirect("/signup");
+    }
     return res.redirect("/petition");
 });
 
 //registration
-app.get("/registration", (req, res) => {
+app.get("/signup", (req, res) => {
     res.render("signup", {
         title: "Snack Box Petition",
     });
 });
 
-app.post("/registration", (req, res) => {
+app.post("/signup", (req, res) => {
     const { firstnameSignup, lastnameSignup, emailSignup, passwordSignup } =
         req.body;
 
@@ -124,7 +129,9 @@ app.get("/petition", (req, res) => {
 app.post("/petition", (req, res) => {
     //console.log("post req");
     const { signature } = req.body;
+    const { user_id } = req.session;
     db.insertSubscriber({
+        user_id: user_id,
         signature: signature,
     }).then((data) => {
         // console.log("petition data", data);

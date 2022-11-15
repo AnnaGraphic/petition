@@ -53,3 +53,17 @@ h2 {
 p {
     padding: 0.1rem;
 }
+a {
+    color: darkmagenta;
+}
+a:hover {
+    color: darkorchid;
+}
+.linklike {
+    padding: 0;
+    color: darkmagenta;
+    text-decoration: underline;
+}
+.linklike:hover {
+    color: darkorchid;
+}

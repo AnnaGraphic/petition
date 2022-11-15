@@ -23,14 +23,15 @@ const bcrypt = require("bcrypt");
 module.exports.getSubscribers = () => {
     return db
         .query(
-            `SELECT 
-                signatures.signature AS signature, 
-                users.first_name AS first_name, 
-                users.last_name AS last_name 
-            FROM signatures 
-            JOIN users ON signatures.user_id=users.id;`
+            `SELECT users.first_name, users.last_name, users_profiles.age, users_profiles.city, users_profiles.url
+        FROM users
+        JOIN signatures
+        ON users.id = signatures.user_id   
+        LEFT JOIN users_profiles
+        ON signatures.user_id = users_profiles.user_id`
         )
         .then((result) => {
+            console.log("1 RESULTS SIGNERS", result.rows);
             return result.rows;
         });
 };
@@ -39,12 +40,12 @@ module.exports.getSubscribers = () => {
 module.exports.insertSubscriber = ({ user_id, signature }) => {
     return db
         .query(
-            `INSERT INTO signatures (signature)
-            VALUES($1)
+            `INSERT INTO signatures (user_id, signature)
+            VALUES($1, $2)
             RETURNING *`,
             //RETURNING gibt die spalten an, die zurueck gegeben werden im result
             // WAS macht dieses ARR?
-            [signature]
+            [user_id, signature]
         )
         .then((result) => {
             // console.log("result", result);
