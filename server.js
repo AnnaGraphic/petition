@@ -224,20 +224,30 @@ app.post("/profile", (req, res) => {
     console.log("req.body:", req.body);
     //also updateUsersTable
     //console.log("age, city, url, userId", ageEdit, cityEdit, url, userId);
-    db.updateUsersTable(firstnameEdit, lastnameEdit, emailEdit, userId).catch(
-        (err) => {
-            console.log(err);
-        }
-    );
-    db.updateProfile(ageEdit, cityEdit, url, userId)
-        .then((user) => {
-            res.render("profile", {
-                title: "Snack Box Petition",
-            });
-        })
+    const updateUsersPromise = db
+        .updateUsersTable(firstnameEdit, lastnameEdit, emailEdit, userId)
         .catch((err) => {
             console.log(err);
         });
+    const updateProfilePromise = db
+        .updateProfile(ageEdit, cityEdit, url, userId)
+        .catch((err) => {
+            console.log(err);
+        });
+    Promise.all([updateProfilePromise, updateUsersPromise]).then(
+        ([profileData, userData]) => {
+            console.log("profile userdata", profileData, userData);
+            res.render("profile", {
+                title: "Snack Box Petition",
+                firstName: userData.first_name,
+                lastName: userData.last_name,
+                city: profileData.city,
+                age: profileData.age,
+                eMail: userData.email,
+                homepage: profileData.url,
+            });
+        }
+    );
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
