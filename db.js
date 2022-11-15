@@ -108,11 +108,16 @@ module.exports.findUser = ({ id: a }) => {
         });
 };
 
-// module.exports.findUser = ({ id: a }) => {
+////JOIN funzt nicht
+// module.exports.findProfile = ({ id: a }) => {
 //     return db
 //         .query(
-//             `SELECT * FROM users WHERE id = $1 FROM signatures
-//             JOIN users ON signatures.user_id=users.id;`,
+//             `SELECT
+//                 users_profiles.city AS city,
+//                 users.first_name AS first_name,
+//                 users.last_name AS last_name
+//             FROM users_profiles
+//             JOIN users ON users_profiles.user_id=users.id;`,
 //             [a]
 //         )
 //         .then((results) => {
@@ -133,7 +138,14 @@ module.exports.updateProfile = (age, city, url, userId) => {
             [age, city, url, userId]
         ) //what to do with result.rows?
         .then((result) => {
-            console.log("query update ", result.rows[0]);
+            //console.log("query update ", result.rows[0]);
             return result.rows[0];
         });
+};
+
+module.exports.countSigners = () => {
+    return db.query("SELECT count(*) FROM signatures ").then((result) => {
+        console.log("countSigners at db", result.rows[0]);
+        return result.rows[0];
+    });
 };

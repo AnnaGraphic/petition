@@ -7,6 +7,9 @@ const fs = require("fs");
 const PORT = 8000;
 const { SECRET } = process.env;
 
+// const authRouter = require("./routes/auth");
+// const route = require("./routes/routes");
+
 //HANDLEBARS
 const handlebars = require("express-handlebars");
 app.engine("handlebars", handlebars.engine());
@@ -17,6 +20,9 @@ const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 
 //MIDDLEWARE
+// app.use(authRouter);
+// app.use(route);
+
 app.use("/", express.static(path.join(__dirname, "public")));
 
 // install middleware to helps read cookies
@@ -48,16 +54,28 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use(["/register", "/login"], (req, res, next) => {
+    if (!req.session.user_id) {
+        next();
+    } else {
+        //if (signature) { res.redirect}
+        return res.redirect("/petition");
+    }
+});
+
 //ROUTES
+app.get("/", (req, res) => {
+    return res.redirect("/petition");
+});
 
 //registration
-app.get("/", (req, res) => {
+app.get("/registration", (req, res) => {
     res.render("signup", {
         title: "Snack Box Petition",
     });
 });
 
-app.post("/", (req, res) => {
+app.post("/registration", (req, res) => {
     const { firstnameSignup, lastnameSignup, emailSignup, passwordSignup } =
         req.body;
 
@@ -96,7 +114,6 @@ app.get("/petition", (req, res) => {
                 title: "Snack Box Petition",
                 firstName: userData.first_name,
                 lastName: userData.last_name,
-                eMail: userData.email,
             });
         })
         .catch((err) => {
@@ -143,6 +160,10 @@ app.post("/login", (req, res) => {
 //thank-you-page
 app.get("/thanks", (req, res) => {
     const { id, firstName, lastName, signatureCanvas } = req.body;
+    db.countSigners().then((result) => {
+        console.log("count", result.count);
+        countSignatures = result.count;
+    });
     db.findUser({
         id: req.session.user_id,
     })
@@ -150,6 +171,7 @@ app.get("/thanks", (req, res) => {
             res.render("thanks", {
                 title: "Snack Box Petition",
                 firstname: userData.first_name,
+                countSignatures: countSignatures,
             });
         })
         .catch((err) => console.log(err));
@@ -169,14 +191,20 @@ app.get("/signers", (req, res) => {
 
 // edit profile
 app.get("/profile", (req, res) => {
+    // change findUser with findProfile
     db.findUser({
         id: req.session.user_id,
     })
         .then((userData) => {
+            console.log("profile userdata", userData);
             res.render("profile", {
                 title: "Snack Box Petition",
                 firstName: userData.first_name,
                 lastName: userData.last_name,
+                city: userData.city,
+                age: userData.age,
+                eMail: userData.email,
+                homepage: userData.url,
             });
         })
         .catch((err) => {

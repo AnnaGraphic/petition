@@ -15,10 +15,10 @@ CREATE TABLE users (
 CREATE TABLE signatures (
      id SERIAL PRIMARY KEY,
      signature TEXT,
-     user_id INT,
-     CONSTRAINT user_id 
-        FOREIGN KEY (id)
-             REFERENCES users(id)
+    user_id INT NULL UNIQUE REFERENCES users(id)
+    --  CONSTRAINT user_id 
+    --     FOREIGN KEY (id)
+    --          REFERENCES users(id)
 );
 
 CREATE TABLE users_profiles (
@@ -26,8 +26,8 @@ CREATE TABLE users_profiles (
     age VARCHAR(255),
     city VARCHAR(255),
     url VARCHAR(255),
-    user_id INT,
-    CONSTRAINT user_id 
-        FOREIGN KEY (id)
-             REFERENCES users(id)
+    user_id INT NULL UNIQUE REFERENCES users(id)
+    -- CONSTRAINT user_id 
+    --     FOREIGN KEY (id)
+    --          REFERENCES users(id)
 );
