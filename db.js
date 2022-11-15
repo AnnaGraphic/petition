@@ -144,9 +144,48 @@ module.exports.updateProfile = (age, city, url, userId) => {
         });
 };
 
+module.exports.updateUsersTable = (first_name, last_name, email, userId) => {
+    console.log(
+        "first_name, last_name, email",
+        first_name,
+        last_name,
+        email,
+        userId
+    );
+    return db
+        .query(
+            `UPDATE  users 
+            SET first_name = $1, last_name = $2, email = $3
+            WHERE id = $4 
+        RETURNING *`,
+            [first_name, last_name, email, userId]
+        ) //what to do with result.rows?
+        .then((result) => {
+            //console.log("query update ", result.rows[0]);
+            return result.rows[0];
+        });
+};
+
+////////
 module.exports.countSigners = () => {
     return db.query("SELECT count(*) FROM signatures ").then((result) => {
         console.log("countSigners at db", result.rows[0]);
         return result.rows[0];
     });
+};
+
+module.exports.showProfile = (userId) => {
+    return db
+        .query(
+            `SELECT users.first_name, users.last_name, users.email, users_profiles.age, users_profiles.city, users_profiles.url
+        FROM users 
+        JOIN signatures
+        ON users.id = signatures.user_id   
+        LEFT JOIN users_profiles
+        ON signatures.user_id = users_profiles.user_id WHERE users.id = $1`,
+            [userId]
+        )
+        .then((result) => {
+            return result.rows[0];
+        });
 };

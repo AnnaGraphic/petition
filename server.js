@@ -199,9 +199,7 @@ app.get("/signers", (req, res) => {
 // edit profile
 app.get("/profile", (req, res) => {
     // change findUser with findProfile
-    db.findUser({
-        id: req.session.user_id,
-    })
+    db.showProfile(req.session.user_id)
         .then((userData) => {
             console.log("profile userdata", userData);
             res.render("profile", {
@@ -221,9 +219,16 @@ app.get("/profile", (req, res) => {
 
 app.post("/profile", (req, res) => {
     const userId = req.session.user_id;
-    const { ageEdit, cityEdit, url } = req.body;
+    const { firstnameEdit, lastnameEdit, emailEdit, ageEdit, cityEdit, url } =
+        req.body;
     console.log("req.body:", req.body);
+    //also updateUsersTable
     //console.log("age, city, url, userId", ageEdit, cityEdit, url, userId);
+    db.updateUsersTable(firstnameEdit, lastnameEdit, emailEdit, userId).catch(
+        (err) => {
+            console.log(err);
+        }
+    );
     db.updateProfile(ageEdit, cityEdit, url, userId)
         .then((user) => {
             res.render("profile", {
@@ -233,7 +238,6 @@ app.post("/profile", (req, res) => {
         .catch((err) => {
             console.log(err);
         });
-    //then und catch
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
