@@ -128,10 +128,12 @@ module.exports.updateProfile = (age, city, url, userId) => {
             `INSERT INTO users_profiles (age, city, url, user_id)
         VALUES($1, $2, $3, $4)
         ON CONFLICT (user_id)
-        DO UPDATE SET age = $1, city = $2, url = $3`,
+        DO UPDATE SET age = $1, city = $2, url = $3
+        RETURNING *`,
             [age, city, url, userId]
         ) //what to do with result.rows?
         .then((result) => {
+            console.log("query update ", result.rows[0]);
             return result.rows[0];
         });
 };
