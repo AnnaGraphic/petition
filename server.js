@@ -54,6 +54,7 @@ app.use(["/register", "/login"], (req, res, next) => {
         if (!req.session.signed) {
             return res.redirect("/petition");
         }
+        next();
     }
 });
 

@@ -30,10 +30,8 @@ router.post("/signup", (req, res) => {
         password: passwordSignup,
     })
         .then((userData) => {
-            //console.log("user data", userData);
+            console.log("user data insertReg", userData);
             req.session.user_id = userData.id;
-            //neuer cookie fuer bereits registriert
-            //namen auch rein
             res.redirect("/petition");
         })
         .catch((err) => {
