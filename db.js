@@ -1,17 +1,15 @@
+//Pg = postgresql
+//const { query } = require("express");
 const e = require("express");
 const spicedPg = require("spiced-pg");
-const { POSTGRES_PWD, POSTGRES_USER, DATABASE_URL } = process.env;
-const db = spicedPg(DATABASE_URL);
+const { POSTGRES_PWD, POSTGRES_USER } = process.env;
+// console.log(POSTGRES_PWD, POSTGRES_USER);
+const database = "petition";
+//5432 = standardport
+const db = spicedPg(
+    `postgres:${POSTGRES_USER}:${POSTGRES_PWD}@localhost:5432/${database}`
+);
 const bcrypt = require("bcrypt");
-
-//.querymethod to query my database
-// db.query(`SELECT * FROM signatures`)
-//     .then(function (result) {
-//         // console.log(result.rows);
-//     })
-//     .catch(function (err) {
-//         console.log(err);
-//     });
 
 module.exports.getSubscribers = () => {
     return db
@@ -29,7 +27,6 @@ module.exports.getSubscribers = () => {
         });
 };
 
-//Preventing SQL injection https://spiced.space/okra/spiced_pg/
 module.exports.insertSubscriber = ({ user_id, signature }) => {
     return db
         .query(
@@ -54,8 +51,6 @@ module.exports.insertRegistration = ({
     const hash = bcrypt.hashSync(password, salt);
     return db
         .query(
-            // kriegt 2 args | 1. string 2. array von parametern
-            //Preventing SQL injection
             `INSERT INTO users (first_name, last_name, email, pwd_hash)
     VALUES($1, $2, $3, $4)
     RETURNING *`,
@@ -102,24 +97,6 @@ module.exports.findUser = ({ id: a }) => {
         })
         .catch((err) => console.log(err));
 };
-
-////JOIN funzt nicht
-// module.exports.findProfile = ({ id: a }) => {
-//     return db
-//         .query(
-//             `SELECT
-//                 users_profiles.city AS city,
-//                 users.first_name AS first_name,
-//                 users.last_name AS last_name
-//             FROM users_profiles
-//             JOIN users ON users_profiles.user_id=users.id;`,
-//             [a]
-//         )
-//         .then((results) => {
-//             console.log("megajoin", result.rows[0]);
-//             return results.rows[0];
-//         });
-// };
 
 module.exports.updateProfile = (age, city, url, userId) => {
     console.log("age, city, url, userId", age, city, url, userId);
