@@ -6,7 +6,7 @@ const { POSTGRES_PWD, POSTGRES_USER, DATABASE_URL } = process.env;
 // console.log(POSTGRES_PWD, POSTGRES_USER);
 const database = "petition";
 //5432 = standardport
-const db = spicedPg(DATABASE_URL);
+const db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 const bcrypt = require("bcrypt");
 
 module.exports.getSubscribers = () => {

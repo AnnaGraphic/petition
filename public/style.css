@@ -41,6 +41,13 @@ canvas {
 button {
     margin: 1rem;
 }
+.logout {
+    position: absolute;
+    right: 1rem;
+    padding: 0.1rem;
+    background-color: rgb(243, 81, 162);
+    border: 0;
+}
 
 /* TYPO */
 h1 {

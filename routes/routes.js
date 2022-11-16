@@ -62,10 +62,11 @@ router.get("/thanks", (req, res) => {
         id: req.session.user_id,
     })
         .then((userData) => {
+            console.log();
             res.render("thanks", {
                 title: "Snack Box Petition",
                 firstname: userData.first_name,
-                countSignatures: countSignatures,
+                countSignatures: userData.countSignatures,
             });
         })
         .catch((err) => console.log(err));
