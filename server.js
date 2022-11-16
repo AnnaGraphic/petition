@@ -133,11 +133,13 @@ app.post("/petition", (req, res) => {
     db.insertSubscriber({
         user_id: user_id,
         signature: signature,
-    }).then((data) => {
-        // console.log("petition data", data);
-        req.session.signed = 1;
-        res.redirect("/thanks");
-    });
+    })
+        .then((data) => {
+            // console.log("petition data", data);
+            req.session.signed = 1;
+            res.redirect("/thanks");
+        })
+        .catch((err) => console.log("petition-post-err", err));
 });
 
 //login
@@ -234,8 +236,8 @@ app.post("/profile", (req, res) => {
         .catch((err) => {
             console.log(err);
         });
-    Promise.all([updateProfilePromise, updateUsersPromise]).then(
-        ([profileData, userData]) => {
+    Promise.all([updateProfilePromise, updateUsersPromise])
+        .then(([profileData, userData]) => {
             console.log("profile userdata", profileData, userData);
             res.render("profile", {
                 title: "Snack Box Petition",
@@ -246,8 +248,10 @@ app.post("/profile", (req, res) => {
                 eMail: userData.email,
                 homepage: profileData.url,
             });
-        }
-    );
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 });
 
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));

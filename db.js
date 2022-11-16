@@ -1,11 +1,6 @@
-//Pg = postgresql
-//const { query } = require("express");
 const e = require("express");
 const spicedPg = require("spiced-pg");
 const { POSTGRES_PWD, POSTGRES_USER, DATABASE_URL } = process.env;
-// console.log(POSTGRES_PWD, POSTGRES_USER);
-const database = "petition";
-//5432 = standardport
 const db = spicedPg(DATABASE_URL);
 const bcrypt = require("bcrypt");
 
@@ -41,8 +36,6 @@ module.exports.insertSubscriber = ({ user_id, signature }) => {
             `INSERT INTO signatures (user_id, signature)
             VALUES($1, $2)
             RETURNING *`,
-            //RETURNING gibt die spalten an, die zurueck gegeben werden im result
-            // WAS macht dieses ARR?
             [user_id, signature]
         )
         .then((result) => {
@@ -76,7 +69,8 @@ module.exports.insertRegistration = ({
             //     result.rows[0]
             // );
             return result.rows[0];
-        });
+        })
+        .catch((err) => console.log(err));
 };
 
 function findUserByEmail(email) {
@@ -87,7 +81,8 @@ function findUserByEmail(email) {
                 throw new Error("email does not exist");
             }
             return results.rows[0];
-        });
+        })
+        .catch((err) => console.log(err));
 }
 
 module.exports.authenticateUser = ({ email, password }) => {
@@ -104,7 +99,8 @@ module.exports.findUser = ({ id: a }) => {
         .query("SELECT * FROM users WHERE id = $1", [a])
         .then((results) => {
             return results.rows[0];
-        });
+        })
+        .catch((err) => console.log(err));
 };
 
 ////JOIN funzt nicht
@@ -139,7 +135,8 @@ module.exports.updateProfile = (age, city, url, userId) => {
         .then((result) => {
             //console.log("query update ", result.rows[0]);
             return result.rows[0];
-        });
+        })
+        .catch((err) => console.log(err));
 };
 
 module.exports.updateUsersTable = (first_name, last_name, email, userId) => {
@@ -161,7 +158,8 @@ module.exports.updateUsersTable = (first_name, last_name, email, userId) => {
         .then((result) => {
             //console.log("query update ", result.rows[0]);
             return result.rows[0];
-        });
+        })
+        .catch((err) => console.log(err));
 };
 
 ////////
