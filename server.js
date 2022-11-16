@@ -1,4 +1,3 @@
-require("dotenv").config();
 const db = require("./db");
 const express = require("express");
 const app = express();
@@ -29,14 +28,12 @@ app.use(express.urlencoded({ extended: false }));
 //Tampering is prevented because of a second cookie that is auto added.
 app.use(
     cookieSession({
-        // secret is used cookieSession to generate the 2. cookie used to verify the integrity of the 1. cookie
         secret: `${SECRET}`,
-        // max age (in milliseconds) is 14 days in this example
         maxAge: 1000 * 60 ** 24 * 14,
-        //name for session cookie
         name: "petition-cookie",
     })
 );
+
 app.use(authRouter);
 app.use(routes);
 
@@ -54,7 +51,6 @@ app.use(["/register", "/login"], (req, res, next) => {
     if (!req.session.user_id) {
         next();
     } else {
-        //if (signature) { res.redirect}
         if (!req.session.signed) {
             return res.redirect("/petition");
         }
