@@ -1,8 +1,10 @@
-<div class="container">
-    <header>
+<header>
         <h1>🌈 Login to a petition 🌈</h1>
         <p>against empty snack boxes</p>
-    </header>
+</header><div class="container">
+   {{#if err }}
+<span> {{this.err}} </span>   
+   {{/if}}
     <div class="main">
     {{!-- login-div --}}
         <form method="POST" action="">
@@ -18,8 +20,11 @@
                 <button id="login">
                     log in
                 </button>
+                <div>
+                    <p>if you are not registred, please <a href="/signup">signup</a> </p>
+                </div>
             </div>
+
         </form>
     </div>
 <footer></footer>
-</div>
