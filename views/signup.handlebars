@@ -3,7 +3,9 @@
 <br>
 <p>against empty snack boxes</p>
 </header>
-
+   {{#if err }}
+<span> {{this.err}} </span>   
+   {{/if}}
 <div class="container">
 {{!-- login-div --}}
     <form method="POST" action="">

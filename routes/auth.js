@@ -36,6 +36,10 @@ router.post("/signup", (req, res) => {
         })
         .catch((err) => {
             console.log("error in signup post: ", err);
+            res.render("login", {
+                err: err.message,
+                title: "Snack Box Petition",
+            });
         });
 });
 
@@ -58,7 +62,6 @@ router.post("/login", (req, res) => {
             console.log("pwd mail", err.message);
             res.render("login", {
                 err: err.message,
-
                 title: "Snack Box Petition",
             });
         });
