@@ -2,7 +2,9 @@
         <h1>🌈 Login to a petition 🌈</h1>
         <p>against empty snack boxes</p>
 </header><div class="container">
-   
+   {{#if err }}
+<span> {{this.err}} </span>   
+   {{/if}}
     <div class="main">
     {{!-- login-div --}}
         <form method="POST" action="">

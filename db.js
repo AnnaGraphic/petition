@@ -1,13 +1,14 @@
-//Pg = postgresql
-//const { query } = require("express");
 const e = require("express");
+
+const bcrypt = require("bcrypt");
 const spicedPg = require("spiced-pg");
-const { POSTGRES_PWD, POSTGRES_USER, DATABASE_URL } = process.env;
-// console.log(POSTGRES_PWD, POSTGRES_USER);
+const { POSTGRES_PWD, POSTGRES_USER } = process.env;
 const database = "petition";
 //5432 = standardport
-const db = spicedPg(DATABASE_URL);
-const bcrypt = require("bcrypt");
+const db = spicedPg(
+    process.env.DATABASE_URL ||
+        `postgres:postgres:postgres@localhost:5432/petition`
+);
 
 module.exports.getSubscribers = () => {
     return db

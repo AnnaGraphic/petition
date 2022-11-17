@@ -55,9 +55,10 @@ router.post("/login", (req, res) => {
             res.redirect("/petition");
         })
         .catch((err) => {
-            console.log(err);
+            console.log("pwd mail", err.message);
             res.render("login", {
-                message: "quatsch",
+                err: err.message,
+
                 title: "Snack Box Petition",
             });
         });
